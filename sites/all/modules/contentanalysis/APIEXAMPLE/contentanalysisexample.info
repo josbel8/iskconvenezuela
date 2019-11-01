@@ -1,0 +1,14 @@
+name = "Content Analysis API Example"
+description = "Example Content Analyzer module"
+package = Content analysis
+core = 7.x
+
+dependencies[] = contentanalysis
+files[] = contentanalysisexample.module
+scripts[] = contentanalysisexample.js
+
+; Information added by Drupal.org packaging script on 2019-03-04
+version = "7.x-1.0-beta7+15-dev"
+core = "7.x"
+project = "contentanalysis"
+datestamp = "1551732491"

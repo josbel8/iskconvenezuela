@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>SoundManager 2 Demo: Play MP3 links on a page, "page as playlist" style</title>
+<meta name="robots" content="noindex" />
+
+<!-- demo.css for this page only, make things pretty -->
+<link rel="stylesheet" type="text/css" href="css/demo.css" />
+
+<!-- Page player core CSS -->
+<link rel="stylesheet" type="text/css" href="css/page-player.css" />
+
+<!-- soundManager.useFlashBlock: related CSS -->
+<link rel="stylesheet" type="text/css" href="../flashblock/flashblock.css" />
+
+<!-- optional: annotations/sub-tracks/notes, and alternate themes -->
+<link rel="stylesheet" type="text/css" href="css/optional-annotations.css" />
+<link rel="stylesheet" type="text/css" href="css/optional-themes.css" />
+
+<style type="text/css">
+ul.playlist li .comment {font-size:0.65em;opacity:0.5}
+</style>
+
+<!-- soundManager API -->
+<script src="../../script/soundmanager2.js"></script>
+
+<script>
+
+/* --------
+
+  Config override: This demo uses shiny flash 9 stuff, overwriting Flash 8-based defaults
+  Alternate PP_CONFIG object must be defined before soundManager.onready()/onload() fire.
+  Alternately, edit the config in page-player.js to simply use the values below by default
+
+-------- */
+
+// demo only, but you can use these settings too..
+soundManager.setup({
+  flashVersion: 9,
+  preferFlash: true, // for visualization effects
+  useHighPerformance: true, // keep flash on screen, boost performance
+  wmode: 'transparent', // transparent SWF, if possible
+  url: '../../swf/'
+});
+
+// custom page player configuration
+
+var PP_CONFIG = {
+  autoStart: false,      // begin playing first sound when page loads
+  playNext: true,        // stop after one sound, or play through list until end
+  useThrottling: false,  // try to rate-limit potentially-expensive calls (eg. dragging position around)</span>
+  usePeakData: true,     // [Flash 9 only] whether or not to show peak data (left/right channel values) - nor noticable on CPU
+  useWaveformData: false,// [Flash 9 only] show raw waveform data - WARNING: LIKELY VERY CPU-HEAVY
+  useEQData: false,      // [Flash 9 only] show EQ (frequency spectrum) data
+  useFavIcon: false     // try to apply peakData to address bar (Firefox + Opera) - performance note: appears to make Firefox 3 do some temporary, heavy disk access/swapping/garbage collection at first(?) - may be too heavy on CPU
+}
+
+</script>
+
+<!-- Page player main script -->
+<script src="script/page-player.js"></script>
+
+<!-- optional: Metadata UI prototype (not needed unless you want the bottom-most demo bits) -->
+<script src="script/optional-page-player-metadata.js"></script>
+
+</head>
+
+<body>
+
+<div id="left">
+
+ <h1><a href="http://www.schillmania.com/projects/soundmanager2/" title="Play a page of mp3s with javascript via SoundManager 2">SoundManager 2</a> / "Page as a playlist"</h1>
+
+ <h2 style="margin-top:0px;border:none">Muxtape.com-style UI, MP3/AAC Player Example</h2>
+
+ <p style="padding-top:0.5em;color:#333">This page uses Flash 9-based effects where supported. The <a href="basic.html" title="Basic page player demo">default config</a> uses Flash 8.</p>
+
+ <p id="experimental-features" style="margin-top:0.5em;color:#333">You can also try enabling <a href="#experimental" onclick="window.location.href = this;window.location.reload()">experimental visualization features</a>.</p>
+
+ <div id="sm2-container">
+  <!-- SM2 flash goes here -->
+ </div>
+
+ <ul class="playlist">
+  <li><a href="../mpc/audio/CRASH_1.mp3">Crash cymbal</a></li>
+  <li><a href="../_mp3/bass.mp3">Bass</a></li>
+  <li><a href="../_mp3/sine,%20square,%20sawtooth,%20rando.mp3">440 Hz sine, square, sawtooth, pink noise, random</a></li>
+  <li><a href="../_mp3/1hz-10khz-sweep.mp3">1Hz - 10KHz sweep</a></li>
+  <!-- files from the web (note that ID3 and waveformData information will *not* load from remote domains without permission, due to Flash security restrictions) -->
+  <li><a href="http://freshly-ground.com/misc/music/20060826%20-%20Armstrong.mp3">20060826 - Armstrong</a></li>
+  <li><a href="http://freshly-ground.com/misc/music/carl-3-barlp.mp3">Barrlping with Carl <span class="comment">(featureblend.com)</span></a></li>
+  <li><a href="http://freshly-ground.com/data/audio/binaural/Mak.mp3" class="exclude">Angry cow sound with "exclude" CSS class <span class="comment">(Browser follows link normally)</span></a></li>
+ </ul>
+
+ <h2>MPEG4 / H.264 + HE-AAC (Flash "MovieStar" 9.0r115+) format support - audio-only example</h2>
+ <h3>A subset of MPEG4 <a href="http://www.adobe.com/support/documentation/en/flashplayer/9/releasenotes.html#fixes_90115">is supported</a> including AAC, FLV, MP4, M4A, MOV, MP4V, 3GP and 3G2 files.</h3>
+
+ <ul class="playlist">
+  <li><a href="http://freshly-ground.com/data/video/Rain%20on%20Car%20Roof.aac">Rain on Car Roof <span class="comment">(MPEG4 .AAC audio, 128 kbps AAC-LC exported from QuickTime)</span></a></li>
+  <li><a href="http://freshly-ground.com/data/video/Jellyfish.mov">Jellyfish <span class="comment">(848x480 H.264 video, playing audio portion only)</span></a></li>
+ </ul>
+
+ <h3 style="margin-top:1em">Basics</h3>
+
+ <p class="note">Don't want a Flash 9 requirement, EQ/waveform, perhaps less CPU? See Flash 8-based <a href="basic.html" title="Page as playlist demo">basic demo</a>.</p>
+
+ <p>Clicking a title will start loading + playing, or pause, a sound.</p>
+ <p>Once loading, click (or click and drag) on the loading/position bar to seek within the sound.</p>
+ <p>The document title reflects the currently-playing sound, and by default the list will play sequentially if left alone. (This is configurable.)</p>
+ 
+ <h3>Themes</h3>
+ <p>Just for fun, a few color schemes (visible when playing/paused):</p>
+ <ul class="themes">
+  <li><a href="#" onclick="return setTheme('dark')">&lt;ul class="playlist dark"&gt;</a> - #333 and #666, mostly</li>
+  <li><a href="#" onclick="return setTheme('gold')">&lt;ul class="playlist gold"&gt;</a> - Frontin' the bling</li>
+  <li><a href="#" onclick="return setTheme('bubblegum')">&lt;ul class="playlist bubblegum"&gt;</a> - ZOMG PONIES!!!ONEONEONE</li>
+  <li><a href="#" onclick="return setTheme('')">&lt;ul class="playlist"&gt;</a> (default)</li>
+ </ul>
+ 
+ <form style="margin:0px;padding:0px" action="#" onsubmit="return false">
+  <div>
+   <input id="makeShiny" name="makeShiny" type="checkbox" onchange="setShiny(this.checked)" value="Shiny" /> <label for="makeShiny">Also add "shiny", eg. &lt;ul class="shiny playlist"&gt;...</label>
+  </div>
+ </form>
+ <script>document.getElementById('makeShiny').checked=false;</script>
+
+ <h2 id="metadata">Experimental (Alpha) Variant: MP3 "Metadata": Annotations / notes / sub-tracks</h2>
+ <p>A potential approach to noting interesting moments in sounds, scene changes, new tracks in seamless DJ mixes etc. Keep in mind this is a single MP3 being loaded, but annotations are placed along the timeline as shown.</p>
+ <p>A "metadata" element contains a nested list of data (UL/LI combination) - in this case, a summary of each scene - and the time at which this item occurs/begins. In order to help with positioning, the total length of the sound is also specified up-front. View the source code of this page for the details.</p>
+
+ <ul class="playlist">
+
+  <li>
+   <a href="http://freshly-ground.com/data/audio/binaural/A%20Virtual%20Haircut%20in%20San%20Francisco%20%283%20Scenes%29.mp3">A Virtual Haircut (3 scenes)</a>
+   <div class="metadata">
+    <div class="duration">4:43</div> <!-- total track time (for positioning while loading, until determined -->
+    <ul>
+     <li><p>Electric razor</p><span>0:00</span></li> <!-- first scene -->
+     <li><p>Water, scissors</p><span>2:41</span></li> <!-- start time of second scene -->
+     <li><p>More razor work</p><span>4:00</span></li>
+    </ul>
+   </div>
+  </li>
+
+  <li>
+   <a href="http://freshly-ground.com/data/audio/binaural/Rubber%20Chicken%20Launch%20%28office%29.mp3">Rubber Chicken Launch (Office)</a>
+   <div class="metadata">
+    <div class="duration">0:47</div>
+    <ul>
+     <li><p>First attempt</p><span>0:00</span></li>
+     <li><p>Fire!</p><span>0:02</span></li>
+     <li><p>"Too much angle"</p><span>0:05</span></li>
+     <li><p>Random chicken noise</p><span>0:18</span></li>
+     <li><p>"Wait a second"</p><span>0:31</span></li>
+     <li><p>Derrr..</p><span>0:34</span></li>
+     <li><p>Launch attempt #2</p><span>0:36</span></li>
+     <li><p>"Wrong angle"</p><span>0:39</span></li>
+     <li><p>"Fail"</p><span>0:42</span></li>
+    </ul>
+   </div>
+  </li>
+
+ </ul>
+
+ <h2>How It Works</h2>
+
+ <p>This example uses <a href="http://www.schillmania.com/projects/soundmanager2/" title="SoundManager 2 Javascript Sound API">SoundManager 2</a> to find links to MP3 files within an unordered list, and makes them playable "in-place" on a page. The script assigns CSS classes to links' parent LI nodes to indicate their state (playing/paused, etc.)</p>
+
+ <h3>Progressive Enhancement</h3>
+
+ <p>This provides a nice HTML base for all browsers and user agents, and enhances progressively for those with Javascript and Flash. Links pointing to MP3s are assigned an onclick handler which intercepts the click (preventing the browser from following the link and unloading the page. SM2 will then create sound objects as needed to play the MP3s. In the event there is an error at runtime or a lack of support (no JS/Flash etc.), the browser will simply load the MP3s directly as it normally would. This includes iPhones, etc.</p>
+
+ <h3>HTML Fragments (UI Element Templates)</h3>
+ <p>Each item in the playlist has its own set of controls and progress indicators, etc. This content is defined once as a hidden template of HTML in the player JavaScript file, separate from the playlist markup, and is cloned for each item as needed. This can be easily styled with CSS as well, of course.</p>
+
+<h2>I'd like to use this.</h2>
+<p>See this <a href="basic.html" title="Page as playlist demo">basic demo</a> for reference.</p>
+<p>The basic demo uses the default Flash 8 configuration, but you can easily change this to use Flash 9 features. The only difference in code is the configuration.</p>
+
+<p>A reminder that if loading from the local filesystem, Flash will deny access to remote (network/internet) URLs by default unless whitelisted via the <a href="http://www.macromedia.com/support/documentation/en/flashplayer/help/settings_manager04.html">Flash Player Global Security Settings Page</a>. Some URLs in this example are remote to demonstrate this.</p>
+
+<h2>Configuration + Options</h2>
+
+<h3>Default configuration</h3>
+
+<p>Behaviours such as auto-start and UI elements like VU meters and spectrum graphs are easy configurable, using an object literal format as shown below.</p>
+<p>The page player config (see related page-player.js file) as below.</p>
+<p>The custom parameters used to make this demo page are highlighted in red.</p>
+<pre class="block"><code>  <span>// ( within page-player.js )</span>
+
+  soundManager.setup({
+    <span>// If you need flash 9, include this line.</span>
+    flashVersion: <span style="color:red">9</span>
+  });
+
+  this.config = {
+    usePeakData: <span style="color:red">true</span>,     <span>// [Flash 9 only] show peak (VU-meter) data</span>
+    useFavIcon: <span style="color:red">true</span>,      <span>// try to show peakData in address bar (Firefox + Opera) - requires usePeakData = true too, o
